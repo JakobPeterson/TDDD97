@@ -1,0 +1,204 @@
+
+<!DOCTYPE html>
+    <head>
+        <title>twidder</title>
+        <link href="static/client.css" rel="stylesheet" type="text/css">
+        <script src="static/client.js" type="text/javascript"></script>
+        
+
+        <script id="welcomeview" type="text/html">
+            <div id="container">
+
+                <div id="logo"><img src="static/wimage.png" alt="logo"></div>
+
+                <div id="signin_container"> 
+                    <form id="signin" onsubmit="signin(this);return false;">
+                        <div class="input"><label for="signinEmail"> Email </label>
+                            <input id="signinEmail" type="email" required></div>
+
+                        <div class="input"><label for="signinPassword"> Password </label>
+                            <input id="signinPassword" type="password" required></div>
+                        <p id="signin_error"> </p>
+                        <input class="button" type="submit" value="login">
+                        
+                    </form>
+                    
+                </div>
+                
+                
+                <div id="signup_container">
+                <form id="signup" onsubmit="signup(this);return false;">
+                    <h1 id="signup-header">Sign up here</h1>
+
+                    <div class="input"><label for="firstname">First name </label>
+                    <input id="firstname" type="text" required></div>
+                    
+                    <div class="input"><label for="familyname">Family name </label>
+                    <input id="familyname" type="text" required></div>
+            
+                    <div class="input"><label for="gender">Gender </label>
+                        <select id="gender" name="gender" required>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+        
+                    <div class="input"><label for="city">City </label>
+                    <input id="city" type="text" required></div>
+                
+                    <div class="input"><label for="country">Country </label>
+                    <input id="country" type="text" required></div>
+
+                    <div class="input"><label for="email">Email </label>
+                    <input id="email" type="email" required></div>
+
+                    <div class="input"><label for="password">Password </label>
+                    <input id="password" type="password" required></div>
+
+                    <div class="input"><label for="repassword">Repeat</label>
+                    <input id="repassword" type="password" required></div>
+                    <p id="signup_error"></p>
+                    <input class="button" type="submit" value="signup">
+                </form>
+                <form id = "recover" onsubmit = "recover(this);return false;">
+                    <div class="input"><label for="recoveremail"> Forgot password? Email: </label>
+                        <input id="recoveremail" type="email" required></div>
+                    <input class = "button" type = "submit" value = "Recover">
+                
+                </form>
+
+                </div>
+            </div>
+        </script>
+
+        <script id="profileview" type="text/html">
+            
+            <div class = "tabs">
+                <button id = "home_button" type="submit" onclick="tabview('home')">Home</button>
+                <button id = "browse_button" type = "submit" onclick="tabview('browse')">Browse</button>
+                <button id = "account_button" type = "submit" onclick="tabview('account')">Account</button>
+            </div> 
+
+            <div id = "home" style="display: block;">
+                <p id = "home_error"> </p>
+                <div id = "user_info">
+                    <div>
+                        <label>Email:</label>
+                        <label id="user_email"></label>
+                        </div>
+                    <div>
+                        <label>First name:</label>
+                        <label id="user_firstname"></label>
+                    </div>
+                    <div>
+                        <label>Family name:</label>
+                        <label id="user_familyname"></label>
+                    </div>
+                    
+                    <div>
+                        <label>Gender:</label>
+                        <label id="user_gender"></label>
+                    </div>
+                    <div>
+                        <label>City:</label>
+                        <label id="user_city"></label>
+                    </div>
+                    <div>
+                        <label>Country:</label>
+                        <label id="user_country"></label>
+                    </div> 
+                </div>
+                
+                <div id="post_stuff">
+                    <form onsubmit="post(this);return false;">
+                    <label>Post here!</label>
+                    <input id="post_text" type="text">
+                    <button id = "post_button" type = "submit">Post</button>
+                    <textarea id="text_area" readonly></textarea>
+                    </form>
+                <button class = "reload" type = "submit" onclick="load_text()">Reload</button>
+                </div>
+                
+
+                
+            </div>
+    
+            <div id = "browse" style="display: none;">
+                <div id = "browsestuff">
+                    <form id="search_user" onsubmit="search_user_info(this);return false;">
+                        <label>Search user:</label>
+                        <input id="search_user_text" type="email">
+                        <button id = "search_user_submit" type = "submit">Search</button>
+                        <label id="search_error"></label>
+                    </form>
+
+                    <div id = "search_user_info" style="display: none;">
+                        <div>
+                            <label>Email:</label>
+                            <label id="search_user_email"></label>
+                            </div>
+                        <div>
+                            <label>First name:</label>
+                            <label id="search_user_firstname"></label>
+                        </div>
+                        <div>
+                            <label>Family name:</label>
+                            <label id="search_user_familyname"></label>
+                        </div>
+                        
+                        <div>
+                            <label>Gender:</label>
+                            <label id="search_user_gender"></label>
+                        </div>
+                        <div>
+                            <label>City:</label>
+                            <label id="search_user_city"></label>
+                        </div>
+                        <div>
+                            <label>Country:</label>
+                            <label id="search_user_country"></label>
+                        </div> 
+                        <label> ________ </label>
+                        <form id="post_stuff_other" onsubmit="post_other(this);return false;">
+                            <label>Post here!</label>
+                            <input id="post_text_other" type="text">
+                            <button id = "post_button_other" type = "submit">Post</button>
+                            <textarea id="text_area_other" readonly></textarea>
+                        </form>
+                        <button class = "reload" type = "submit" onclick="load_text_other()">Reload</button>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+    
+            <div id = "account" style="display: none;">
+                <form id = "changepassword" onsubmit="changepassword(this);return false;">
+                    <div class="input"><label for="oldpassword">Old password </label>
+                    <input id="oldpassword" type="password" required></div>
+
+                    <div class="input"><label for="newpassword">New password </label>
+                    <input id="newpassword" type="password" required></div>
+
+                    <div class="input"><label for="renewpassword">Repeat new password</label>
+                    <input id="renewpassword" type="password" required></div>
+                    <input id = "newpasswordsubmit" type = "submit" value="Change password">
+                    <p id="changepassword_error"></p>
+                </form>
+                <form id = "signout">
+                    <button id = "signoutsubmit" type = "submit" onclick="signout()">Sign out</button>
+                </form> 
+            </div>
+
+        </script>
+
+    </head>
+    <body>
+        <div id="content"></div>
+    </body>
+</html>
+
+
+
+
+
