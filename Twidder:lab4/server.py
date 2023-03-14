@@ -24,14 +24,11 @@ bcrypt = Bcrypt(app)
 def recieve_hmac_token():
     token = request.headers['Authorization']
     hash_token = request.json()
-    comapre_token = hmac.new('secret', msg=token, digestmod=hashlib.sha256)
+    compare_token = hmac.new('secret', msg=token, digestmod=hashlib.sha256)
     if hash_token == compare_token:
         return token, 200
     else:
         return "", 400
-    
-
-
 
 @app.route("/", methods = ['GET'])
 def root():
@@ -47,8 +44,6 @@ def socket_connect(ws):
             print("email added in ws")
         else:
             print("email not found") ## problem vid displayview efter användning av funktioner
-            
-
 
 @app.teardown_request
 def teardown(exception):
@@ -65,11 +60,11 @@ def sign_out():
         if email in sockets:
             del sockets[email]
         if(database_helper.remove_user(token)):
-            return "", 200
+            return "", 200 #Successfully logged out
         else:
-            return "", 404
+            return "", 500 #Something went wrong
     else:
-        return "", 401
+        return "", 401 #You do not have access
 
 @app.route('/sign_in', methods=['POST'])
 def sign_in():
@@ -91,15 +86,13 @@ def sign_in():
             token = database_helper.generate_token()
             logged = database_helper.logged_in(email, token)
             if (logged):
-                return jsonify(token), 200
+                return jsonify(token), 200 #Successfully signed in
             else:
-                return "", 200
+                return "", 500 #Something went wrong in the program 
         else:
-            #Error: wrong password or username
-            return "", 404
+            return "", 404 #Wrong password or username
     else:
-        #There is no user with that username
-        return "", 400
+        return "", 400 #There is no user with that username
     
 
 @app.route('/sign_up', methods=['POST'])
@@ -128,14 +121,13 @@ def sign_up():
             #Reg the new user
             success = database_helper.reguser(email, pw_hash, firstname, familyname, gender, city, country)
             if (success == True):
-                return "", 200 #New user
+                return "", 200 #Successfully created a new user
             else:
-                return "", 404 #Failed to create new user
-            
+                return "", 500 #Failed to create new user  
         else:
             return "", 400 #Invalid data
     else:
-            return "", 409 #user already excists 
+            return "", 409 #user already exists 
    
 
 
@@ -144,7 +136,7 @@ def sign_up():
 @app.route('/change_password', methods = ['PUT'])
 def change_password():
     token = request.headers['Authorization']
-    if(token):
+    if(token != None):
         data = request.get_json()
         password = data['password']
         newpassword = data['newpassword']
@@ -154,11 +146,11 @@ def change_password():
         print("user: " + user[3])
         if bcrypt.check_password_hash(user[3], password): ## new
             database_helper.change_password(email, bcrypt.generate_password_hash(newpassword).decode('utf-8')) ## new
-            return "", 200
+            return "", 200 #Successfully changed the password
         else:
-            return "", 404
+            return "", 404 #The passwords don't match
     else:
-        return "", 401
+        return "", 401 #You do not have access
     
 
 @app.route('/get_user_data_by_email', methods = ['PUT'])
@@ -170,29 +162,29 @@ def get_user_data_by_email():
         if (database_helper.find_user(email)):
             user = database_helper.user_data_by_email(email)
             if not (user==None):
-                return jsonify(user), 200
+                return jsonify(user), 200 #Successfully got the userdata
             else:
-                return "", 404
+                return "", 500 #Something wrong in the program
         else:
-            return "", 404
+            return "", 404 #No user with that email
     else:
-        return "", 401    
+        return "", 401  #You do not have access 
 
 @app.route('/get_user_data_by_token', methods = ['GET'])
 def get_user_data_by_token():
     token = request.headers['Authorization']
-    if(token):
+    if(token != None):
         email = database_helper.token_to_email(token)
         if (email != None):
             user = database_helper.user_data_by_email(email)
             if (user != None):
-                return jsonify(user), 200
+                return jsonify(user), 200 #Succesfully got userdata
             else:
-                return "", 404
+                return "", 500 #Something wrong in the program
         else:
-            return  "", 404
+            return  "", 404 #There is no user with that token
     else:
-        return "", 401    
+        return "", 401 #You do not have access   
 
 @app.route('/get_user_messages_by_email', methods = ['PUT'])
 def get_user_messages_by_email():
@@ -200,9 +192,9 @@ def get_user_messages_by_email():
     email = data['email']
     if (database_helper.find_user(email)):
         messages = database_helper.get_user_messages_by_email(email)
-        return jsonify(messages), 200
+        return jsonify(messages), 200 #Sucessfully got user messages
     else:
-        return "", 404
+        return "", 404 #There is no such user
 
 @app.route('/get_user_messages_by_token', methods = ['GET'])
 def get_user_messages_by_token():
@@ -210,9 +202,9 @@ def get_user_messages_by_token():
     email = database_helper.token_to_email(token)
     messages = database_helper.get_user_messages_by_email(email)
     if (messages != None):
-        return jsonify(messages), 200
+        return jsonify(messages), 200 #Succesfully got user messages
     else:
-        return "", 400
+        return "", 404 #There are no messages
 
 @app.route('/post_message', methods = ['POST'])
 def post_message():
@@ -229,17 +221,17 @@ def post_message():
                 if (database_helper.find_user(to_email) != None):
                     success = database_helper.post_message(from_email, message, to_email)
                     if(success):
-                        return "", 201
+                        return "", 201 #Succesfully posted message
                     else:
-                        return "", 404
+                        return "", 500 #Wrong in program
                 else:
-                    return "", 404
+                    return "", 404 #No such user 
             else:
-                return "", 404
+                return "", 404 #No user with that password
         else:
-            return "", 404
+            return "", 401 #You do not have access
     else: 
-        return "", 400
+        return "", 400 #There is no message to post
 
 
 @app.route('/recover_password', methods = ['POST'])
@@ -269,9 +261,9 @@ def recover_password():
         
         success = database_helper.change_password(email, bcrypt.generate_password_hash(newpassword).decode('utf-8'))
         if(success):
-            return "", 200
+            return "", 200 #Success with changing password
         else:
-            return "", 500
+            return "", 500 #Something wrong in the program
     else:
         return "", 404 #No such user
 
