@@ -36,7 +36,6 @@ function socket_connect(){
             localStorage.setItem('token', "");
             displayView();
         }
-        
     });
 }
 
@@ -45,6 +44,19 @@ window.onload = function() {
     //localStorage.setItem('token', "");
     displayView();
 }
+
+
+function hmac_token(){
+    let token = localStorage.getItem('token');
+    req.setRequestHeader("Authorization", token);
+    let secret = 'secret';
+    let hmac = CryptoJS.HmacSHA256(token, secret);
+    let req = new XMLHttpRequest();
+    req.open("POST", "/token_check", true);
+    req.setRequestHeader("Content-type", "application/json;charset=UTF-8")
+    req.send(JSON.stringify(hmac))
+}
+
 
 checkpassword = function(password, repassword, section_error){
 
@@ -214,6 +226,7 @@ signout = function() {
                 console.log("signout");
                 message = "Signed out successfully!";
                 localStorage.setItem('token', "");
+                print("token before signout reload: " +token)
                 displayView();
             }
             else if (req.status == 401){
@@ -434,7 +447,6 @@ function recover(formData){
 
 
 }
-
 
 function drop(ev){
     ev.preventDefault();
