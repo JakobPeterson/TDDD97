@@ -1,0 +1,1 @@
+web: gunicorn -b https://twiddertwidder.herokuapp.com/ --workers 1 --threads 100 server:app
