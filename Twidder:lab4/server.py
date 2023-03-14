@@ -267,7 +267,7 @@ def recover_password():
             smtp.login(from_email, from_password)
             smtp.sendmail(from_email, to_email, em.as_string())
         
-        success = database_helper.change_password(email, newpassword)
+        success = database_helper.change_password(email, bcrypt.generate_password_hash(newpassword).decode('utf-8'))
         if(success):
             return "", 200
         else:
