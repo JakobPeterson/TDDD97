@@ -3,14 +3,34 @@ import json
 import database_helper
 from email_validator import validate_email
 from flask_sock import Sock
-import yagmail
+from flask_bcrypt import Bcrypt
 import smtplib
 import ssl
 from email.message import EmailMessage
 
+
+import hmac
+import base64
+import hashlib
+from datetime import datetime, timedelta
+
 app = Flask(__name__)
 sock = Sock(app)
 sockets = {}
+
+bcrypt = Bcrypt(app)
+
+@app.route("/token_check", methods = ['POST'])
+def recieve_hmac_token():
+    token = request.headers['Authorization']
+    hash_token = request.json()
+    comapre_token = hmac.new('secret', msg=token, digestmod=hashlib.sha256)
+    if hash_token == compare_token:
+        return token, 200
+    else:
+        return "", 400
+    
+
 
 
 @app.route("/", methods = ['GET'])
@@ -19,18 +39,14 @@ def root():
 
 @sock.route('/profileview')
 def socket_connect(ws):
-    print(sockets)
     while True:
-        print("hello darling")
         token = ws.receive()
-        print("lets go: " + token)
         email = database_helper.token_to_email(token)
         if email:
             sockets[email] = ws
-            print(sockets)
             print("email added in ws")
         else:
-            print("email not found")
+            print("email not found") ## problem vid displayview efter användning av funktioner
             
 
 
@@ -42,9 +58,9 @@ def teardown(exception):
 @app.route('/sign_out', methods=['PUT'])
 def sign_out():
     token = request.headers['Authorization']
-    print("2: " + token)
+    print("signout token: " + token)
     email = database_helper.token_to_email(token)
-    print(email)
+    print("signout email: " + email)
     if (email != None):
         if email in sockets:
             del sockets[email]
@@ -65,20 +81,15 @@ def sign_in():
     #Check if there is a user with that email
     if (user != None):
         #Check if the email and username is correct
-        if  user[1] == email and user[3] == password:
+        if  user[1] == email and bcrypt.check_password_hash(user[3], password): ## new
             if email in sockets:
                 other_ws = sockets[email]
                 other_ws.send('signout')
                 #other_ws.close()
                 database_helper.remove_user_by_email(email)
                 del sockets[email]
-                print(sockets)
-                
             token = database_helper.generate_token()
-            print("new token: " + token)
-            print(email)
             logged = database_helper.logged_in(email, token)
-            print(logged)
             if (logged):
                 return jsonify(token), 200
             else:
@@ -101,6 +112,9 @@ def sign_up():
     gender = data['gender']
     city = data['city']
     country = data['country']
+
+    pw_hash = bcrypt.generate_password_hash(password).decode('utf-8') ## new
+    print(pw_hash)
     
     #Checking if there is no user with that email
     if (database_helper.find_user(email) is None):
@@ -112,7 +126,7 @@ def sign_up():
             len(city) == None or
             len(country) == None):
             #Reg the new user
-            success = database_helper.reguser(email, password, firstname, familyname, gender, city, country)
+            success = database_helper.reguser(email, pw_hash, firstname, familyname, gender, city, country)
             if (success == True):
                 return "", 200 #New user
             else:
@@ -135,10 +149,11 @@ def change_password():
         password = data['password']
         newpassword = data['newpassword']
         email = database_helper.token_to_email(token)
+        print("email: " + email)
         user = database_helper.find_user(email)
-        print(user)
-        if (user[3] == password):
-            database_helper.change_password(email, newpassword)
+        print("user: " + user[3])
+        if bcrypt.check_password_hash(user[3], password): ## new
+            database_helper.change_password(email, bcrypt.generate_password_hash(newpassword).decode('utf-8')) ## new
             return "", 200
         else:
             return "", 404
@@ -166,7 +181,6 @@ def get_user_data_by_email():
 @app.route('/get_user_data_by_token', methods = ['GET'])
 def get_user_data_by_token():
     token = request.headers['Authorization']
-    print(token)
     if(token):
         email = database_helper.token_to_email(token)
         if (email != None):
@@ -227,6 +241,7 @@ def post_message():
     else: 
         return "", 400
 
+
 @app.route('/recover_password', methods = ['POST'])
 def recover_password():
     data = request.get_json()
@@ -259,6 +274,8 @@ def recover_password():
             return "", 500
     else:
         return "", 404 #No such user
+
+
 
 
 

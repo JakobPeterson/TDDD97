@@ -52,7 +52,7 @@ def generate_token():
         token = token + letters[randint(0,len(letters)-1)]
     return token
 
-def logged_in(email,token):
+def logged_in(email, token):
     cursor = get_db()
     try:
         cursor.execute('INSERT INTO loggedinusers VALUES(?, ?)', [email,token])
@@ -79,7 +79,6 @@ def reguser(email, password, firstname, familyname, gender, city, country):
 #---------Sign out-------------#
 
 def token_to_email(token):
-
     try:
         cursor = get_db().execute('SELECT * from loggedinusers where token = ?', [token])
         match = cursor.fetchone()
@@ -96,6 +95,25 @@ def remove_user(token):
         return True
     except:
         return False
+def remove_user_by_email(email):
+    cursor = get_db()
+    try:
+        cursor.execute('DELETE from loggedinusers where email = ?', [email])
+        cursor.commit()
+        return True
+    except:
+        return False
+
+def already_logged_in(email):
+    cursor = get_db()
+    try:
+        cursor = get_db().execute('SELECT * from loggedinusers where email = ?', [email])
+        print("already logged in: " + email)
+        cursor.close()
+        return True
+    except:
+        return False
+
 
 
 #----------Change password-----------#
@@ -103,7 +121,7 @@ def remove_user(token):
 def change_password(email, newpassword):
     cursor = get_db()
     try:
-        cursor.execute('UPDATE users SET password = ? WHERE email =  ? ', [newpassword, email])
+        cursor.execute('UPDATE users SET password = ? WHERE email =  ?', [newpassword, email])
         cursor.commit()
         return True
     except:
@@ -114,28 +132,29 @@ def change_password(email, newpassword):
 def user_data_by_email(email):
     cursor = get_db()
     try:
-        c = cursor.execute('SELECT * from users where email = ?', [email])
-        matches = c.fetchall()
+        c = cursor.execute('SELECT * from users where email = ?', [email,])
+        match = c.fetchall()[0]
         c.close()
-        return matches
+        return match 
     except:
         return None
-
+    
 
 def get_user_messages_by_email(email):
+    cursor = get_db()
     try:
-        cursor = get_db().execute('SELECT * from messages where to_email = ?', [email])
-        matches = cursor.fetchall()
-        cursor.close()
-        return matches
+        c = cursor.execute('SELECT * from messages where toemail = ?', [email])
+        match = c.fetchall()
+        c.close()
+        return match
     except:
         return None
 
 #--------Post message----------#
 def post_message(from_email, message, to_email):
     cursor = get_db()
-    try:
-        cursor.execute('INSERT INTO messages (from_Email, message, to_Email) VALUES(?,?,?)', [from_email, message, to_email])
+    try: 
+        cursor.execute('INSERT INTO messages(fromemail, message, toemail) VALUES(?,?,?)',[from_email, message, to_email])
         cursor.commit()
         return True
     except:

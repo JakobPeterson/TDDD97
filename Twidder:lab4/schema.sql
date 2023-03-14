@@ -15,7 +15,7 @@ CREATE TABLE if NOT EXISTS loggedinusers(
     primary key(token)
 );
 
-create table if NOT EXISTS messages(
+CREATE TABLE if NOT EXISTS messages(
     ID INTEGER PRIMARY KEY AUTOINCREMENT,
     from_email varchar(50),
     message varchar(250),
