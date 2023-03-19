@@ -47,16 +47,54 @@ window.onload = function() {
 
 
 function hmac_token(){
+    console.log("2");
     let token = localStorage.getItem('token');
-    req.setRequestHeader("Authorization", token);
+    console.log("333");
     let secret = 'secret';
-    let hmac = CryptoJS.HmacSHA256(token, secret);
-    let req = new XMLHttpRequest();
-    req.open("POST", "/token_check", true);
-    req.setRequestHeader("Content-type", "application/json;charset=UTF-8")
-    req.send(JSON.stringify(hmac))
+    console.log("4444");
+    console.log("666666");
+    var hmac = CryptoJS.AES.encrypt("hej", "hej");
+    console.log("55555");
+    console.log(hmac);
+    return hmac;
 }
 
+function changepassword(formData) {
+    var oldpassword = formData.oldpassword.value;
+    var newpassword = formData.newpassword.value;
+    var renewpassword = formData.renewpassword.value;
+
+    if(checkpassword(newpassword, renewpassword, 'changepassword_error')){
+        let message = "";
+        let req = new XMLHttpRequest();
+        req.open("PUT", "/change_password", true);
+        req.setRequestHeader("Content-type", "application/json;charset=UTF-8");
+        // console.log("0")
+        // req.setRequestHeader("email", localStorage.getItem('email'));
+        // console.log("1")
+        //token = hmac_token();
+        
+        req.setRequestHeader("Authorization", localStorage.getItem('token'));
+        req.send(JSON.stringify({'password' : oldpassword, 'newpassword' : newpassword}));
+        req.onreadystatechange =  function(){
+            if (req.readyState == 4){
+                if (req.status == 200){
+                    message = "Password changed!";
+                    document.getElementById("changepassword_error").style.color = "green";
+                }
+                else if (req.status == 401){
+                    message = "Not authorized.";
+                    document.getElementById("changepassword_error").style.color = "red";
+                }
+                else if (req.status == 404){
+                    message = "Incorrect password!";
+                    document.getElementById("changepassword_error").style.color = "red";
+                }
+                document.getElementById('changepassword_error').innerHTML = message;
+            }
+        }
+    }
+}
 
 checkpassword = function(password, repassword, section_error){
 
@@ -133,6 +171,8 @@ function signup(formData){
 
 function signin(formData){
     user = {'email':formData.signinEmail.value.toLowerCase(), 'password':formData.signinPassword.value};
+    localStorage.setItem('email',formData.signinEmail.value.toLowerCase());
+    console.log(localStorage.getItem('email'))
     let message = " ";
     let req = new XMLHttpRequest();
     req.open("POST", "/sign_in", true);
@@ -181,44 +221,16 @@ tabview = function(tabname) {
     document.getElementById(tabname).style.display = "block";
 }
 
-function changepassword(formData) {
-    var oldpassword = formData.oldpassword.value;
-    var newpassword = formData.newpassword.value;
-    var renewpassword = formData.renewpassword.value;
 
-    if(checkpassword(newpassword, renewpassword, 'changepassword_error')){
-        let message = "";
-        let req = new XMLHttpRequest();
-        req.open("PUT", "/change_password", true);
-        req.setRequestHeader("Content-type", "application/json;charset=UTF-8")
-        req.setRequestHeader("Authorization", localStorage.getItem("token"));
-        req.send(JSON.stringify({'password' : oldpassword, 'newpassword' : newpassword}));
-        req.onreadystatechange =  function(){
-            if (req.readyState == 4){
-                if (req.status == 200){
-                    message = "Password changed!";
-                    document.getElementById("changepassword_error").style.color = "green";
-                }
-                else if (req.status == 401){
-                    message = "Not authorized.";
-                    document.getElementById("changepassword_error").style.color = "red";
-                }
-                else if (req.status == 404){
-                    message = "Incorrect password!";
-                    document.getElementById("changepassword_error").style.color = "red";
-                }
-                document.getElementById('changepassword_error').innerHTML = message;
-            }
-        }
-    }
-}
 
 signout = function() {
     var message = "";
     var req = new XMLHttpRequest();
-    req.open("PUT", "/sign_out", true); 
+    req.open("DELETE", "/sign_out", true); 
     req.setRequestHeader("Content-type", "application/json;charset=UTF-8")
-    req.setRequestHeader("Authorization", localStorage.getItem('token'));
+    req.setRequestHeader("Email", localStorage.getItem('email'));
+    token = hmac_token(); 
+    req.setRequestHeader("Authorization", token);
     req.send(null);
     req.onreadystatechange = function(){
         if (req.readyState == 4){
@@ -226,7 +238,7 @@ signout = function() {
                 console.log("signout");
                 message = "Signed out successfully!";
                 localStorage.setItem('token', "");
-                print("token before signout reload: " +token)
+                console.log("token before signout reload: " + token)
                 displayView();
             }
             else if (req.status == 401){
@@ -312,6 +324,7 @@ search_user_info = function(formData) {
 
 
 post = function(formData){
+    
     var message = "";
     var req = new XMLHttpRequest();
     req.open("POST", "/post_message", true); 
@@ -418,10 +431,12 @@ function load_text_other(){
 }
 
 function recover(formData){
+    console.log("hej");
     var req = new XMLHttpRequest();
     req.open("POST", "/recover_password", true); 
     req.setRequestHeader("Content-type", "application/json;charset=UTF-8");
     req.send(JSON.stringify({'email':formData.recoveremail.value.toLowerCase()}));
+    console.log(formData.recoveremail.value.toLowerCase());
     req.onreadystatechange =  function(){
         if (req.readyState == 4){
             if (req.status == 200){
@@ -446,18 +461,4 @@ function recover(formData){
     }
 
 
-}
-
-function drop(ev){
-    ev.preventDefault();
-    var data = ev.dataTransfer.getData("text");
-    ev.target.appendChild(document.getElementById(data));
-}
-
-function allowDrop(ev){
-    ev.preventDefault();
-}
-
-function drag(ev){
-    ev.dataTransfer.setData("text", ev.target.id);
 }
