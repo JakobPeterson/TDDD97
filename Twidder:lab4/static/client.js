@@ -278,6 +278,8 @@ user_info = function() {
             else if (req.status == 404){
                 message = "Failed to load info!";
                 document.getElementById("home_error").style.color = "red";
+                localStorage.setItem('token', "");
+                displayView();
             }
             document.getElementById('home_error').innerHTML = message;
         }
