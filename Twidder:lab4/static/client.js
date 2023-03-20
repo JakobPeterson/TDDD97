@@ -4,33 +4,24 @@
 displayView = function(){
     //the code required to display a view
     if(localStorage.getItem('token') == null || localStorage.getItem('token') == ""){
-        alert("1");
         console.log(localStorage.getItem('token'));
         document.getElementById('content').innerHTML = document.getElementById('welcomeview').innerHTML;   
     }
     else {
         document.getElementById('content').innerHTML = document.getElementById('profileview').innerHTML;
         document.getElementById('home_button').style.color = "green";
-        
-        alert("1");
-        user_info();
-        alert("2");
+        user_info();   
         load_text();
-        alert("3");
         socket_connect();
-        alert("4");
     }    
 }
 
 
 function socket_connect(){
-    var socket = new WebSocket('ws://0.0.0.0:5000/profileview');
+    var socket = new WebSocket('ws://127.0.0.1:8000/profileview');
     socket.onopen = function(){
         socket.send(localStorage.getItem('token'));
     }
-    // socket.onclose = function(){
-    //     socket = null;
-    // }
     console.log("success");
     socket.addEventListener('message', (event) => {
         console.log(event.data);
@@ -44,17 +35,15 @@ function socket_connect(){
 
 
 window.onload = function() {
-    localStorage.setItem('token', "");
+    //localStorage.setItem('token', "");
     displayView();
 }
 
 
 function hmac_token(){
     let token = localStorage.getItem('token');
-    alert(token);
     let secret = 'secret';
     var hmac = CryptoJS.HmacSHA256(token, token);
-    alert(hmac);
     return hmac;
 }
 
@@ -64,15 +53,18 @@ signout = function() {
     req.open("DELETE", "/sign_out", true); 
     req.setRequestHeader("Content-type", "application/json;charset=UTF-8")
     req.setRequestHeader("Email", localStorage.getItem('email'));
-    token = hmac_token(); 
+    token = localStorage.getItem(token)//hmac_token();
+    req.setRequestHeader("Authorization", token); 
     //data = {'email': localStorage.getItem('email'), 'token': token};
     req.setRequestHeader("Authorization", token);
     req.send(null);
     req.onreadystatechange = function(){
         if (req.readyState == 4){
             if (req.status == 200){
+                console.log("signout");
                 message = "Signed out successfully!";
                 localStorage.setItem('token', "");
+                console.log("token before signout reload: " + token)
                 displayView();
             }
             else if (req.status == 500){
@@ -96,7 +88,7 @@ function changepassword(formData) {
         req.open("PUT", "/change_password", true);
         req.setRequestHeader("Content-type", "application/json;charset=UTF-8");
         req.setRequestHeader("Email", localStorage.getItem('email'));
-        token = hmac_token(); 
+        token = localStorage.getItem(token) //hmac_token(); 
         req.setRequestHeader("Authorization", token);
         req.send(JSON.stringify({'password' : oldpassword, 'newpassword' : newpassword}));
         req.onreadystatechange =  function(){
@@ -196,6 +188,7 @@ function signup(formData){
 function signin(formData){
     user = {'email':formData.signinEmail.value.toLowerCase(), 'password':formData.signinPassword.value};
     localStorage.setItem('email',formData.signinEmail.value.toLowerCase());
+    console.log(localStorage.getItem('email'))
     let message = " ";
     let req = new XMLHttpRequest();
     req.open("POST", "/sign_in", true);
@@ -205,6 +198,7 @@ function signin(formData){
         if (req.readyState == 4){
             if (req.status == 200){
                 message = "Sign in successful!";
+                //document.getElementById("signin_error").style.color = "green";
                 localStorage.setItem('token', JSON.parse(req.responseText));
                 displayView();
             }
@@ -252,24 +246,15 @@ tabview = function(tabname) {
 
 user_info = function() {
     var message = "";
-    alert("hejdasasda");
     var req = new XMLHttpRequest();
-    alert("hedasj");
     req.open("GET", "/get_user_data_by_token", true);
-    alert("hedasdj");
     req.setRequestHeader("Content-type", "application/json;charset=UTF-8");
-    alert("hejasds");
     req.setRequestHeader("Email", localStorage.getItem('email'));
-    alert("heas");
-    token = hmac_token(); 
-    alert("hejaa");
+    token = localStorage.getItem(token)//hmac_token();
     req.setRequestHeader("Authorization", token);
-    alert("hejsaaa");
     req.send(null);
-    alert("hejsa");
     req.onreadystatechange = function(){
         if (req.readyState == 4){
-            
             if (req.status == 200){
                 let data = JSON.parse(req.responseText);
                 document.getElementById("user_email").innerHTML = data[0];
@@ -285,7 +270,6 @@ user_info = function() {
             }
             else if (req.status == 404){
                 message = "Failed to load info!";
- 
                 localStorage.setItem('token', "");
                 displayView();
             }
@@ -299,7 +283,7 @@ search_user_info = function(formData) {
     //let data = formData.search_user_text.value.toLowerCase();
     req.open("PUT", "/get_user_data_by_email", true);
     req.setRequestHeader("Email", localStorage.getItem('email'));
-    token = hmac_token(); 
+    token = localStorage.getItem(token)//hmac_token();
     req.setRequestHeader("Authorization", token);
     req.setRequestHeader("Content-type", "application/json;charset=UTF-8");
     req.send(JSON.stringify({'email':formData.search_user_text.value.toLowerCase()}));
@@ -337,7 +321,7 @@ post = function(formData){
     req.open("POST", "/post_message", true); 
     req.setRequestHeader("Content-type", "application/json;charset=UTF-8");
     req.setRequestHeader("Email", localStorage.getItem('email'));
-    token = hmac_token(); 
+    token = localStorage.getItem(token)//hmac_token();
     req.setRequestHeader("Authorization", token);
     req.send(JSON.stringify({
         'message' : formData.post_text.value,
@@ -368,7 +352,7 @@ post_other = function(formData){
     var req = new XMLHttpRequest();
     req.open("POST", "/post_message", true); 
     req.setRequestHeader("Email", localStorage.getItem('email'));
-    token = hmac_token(); 
+    token = localStorage.getItem(token)//hmac_token(); 
     req.setRequestHeader("Authorization", token);
     req.setRequestHeader("Content-type", "application/json;charset=UTF-8");
     to_email = document.getElementById('search_user_email').innerHTML;
@@ -402,7 +386,7 @@ function load_text(){
     var req = new XMLHttpRequest();
     req.open("GET", "/get_user_messages_by_token", true); 
     req.setRequestHeader("Email", localStorage.getItem('email'));
-    token = hmac_token(); 
+    token = localStorage.getItem(token)//hmac_token();
     req.setRequestHeader("Authorization", token);
     req.setRequestHeader("Content-type", "application/json;charset=UTF-8");
     req.send(null);
@@ -434,7 +418,7 @@ function load_text_other(){
     var req = new XMLHttpRequest();
     req.open("PUT", "/get_user_messages_by_email", true); 
     req.setRequestHeader("Email", localStorage.getItem('email'));
-    token = hmac_token(); 
+    token = localStorage.getItem(token)//hmac_token();
     req.setRequestHeader("Authorization", token);
     req.setRequestHeader("Content-type", "application/json;charset=UTF-8");
     req.send(JSON.stringify({'email':document.getElementById('search_user_text').value.toLowerCase()}));
