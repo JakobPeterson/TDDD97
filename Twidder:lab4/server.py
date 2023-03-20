@@ -65,7 +65,7 @@ def teardown(exception):
 
 @app.route('/sign_out', methods=['DELETE'])
 def sign_out():
-    token = hmac_token() ##request.headers['Authorization']
+    token = request.headers['Authorization'] ##token = hmac_token() 
     email = database_helper.token_to_email(token)
     if (email != None):
         if (email in sockets):
@@ -140,7 +140,7 @@ def sign_up():
 
 @app.route('/change_password', methods = ['PUT'])
 def change_password():
-    token = hmac_token()
+    token = request.headers['Authorization'] ##token = hmac_token() 
     user = database_helper.token_to_email(token)
     if(user):  
         data = request.get_json()
@@ -162,7 +162,7 @@ def change_password():
 
 @app.route('/get_user_data_by_email', methods = ['PUT'])
 def get_user_data_by_email():
-    token = hmac_token()
+    token = request.headers['Authorization'] ##token = hmac_token() 
     data = request.get_json()
     email = data['email']
     user_email = database_helper.token_to_email(token)
@@ -178,7 +178,7 @@ def get_user_data_by_email():
 
 @app.route('/get_user_data_by_token', methods = ['GET'])
 def get_user_data_by_token():
-    token = hmac_token()
+    token = request.headers['Authorization'] ##token = hmac_token() 
     email = database_helper.token_to_email(token)
     if (email != None):
         user = database_helper.user_data_by_email(email)
@@ -192,7 +192,7 @@ def get_user_data_by_token():
 
 @app.route('/get_user_messages_by_email', methods = ['PUT'])
 def get_user_messages_by_email():
-    token = hmac_token()
+    token = request.headers['Authorization'] ##token = hmac_token() 
     data = request.get_json()
     email = data['email']
     user_email = database_helper.token_to_email(token)
@@ -207,7 +207,7 @@ def get_user_messages_by_email():
 
 @app.route('/get_user_messages_by_token', methods = ['GET'])
 def get_user_messages_by_token():
-    token = hmac_token()
+    token = request.headers['Authorization'] ##token = hmac_token() 
     email = database_helper.token_to_email(token)
     if (email != None):
         messages = database_helper.get_user_messages_by_email(email)
@@ -221,7 +221,7 @@ def get_user_messages_by_token():
 @app.route('/post_message', methods = ['POST'])
 def post_message():
     data = request.get_json()
-    token = hmac_token()
+    token = request.headers['Authorization'] ##token = hmac_token() 
     from_email = database_helper.token_to_email(token)
     if (from_email != None):
         message = data['message']
