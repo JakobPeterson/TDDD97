@@ -73,6 +73,7 @@ signout = function() {
             else if (req.status == 401){
                 message = "You are not logged in!";
             }
+            document.getElementById('account_error').innerHTML = message;
         }
     }
 }
