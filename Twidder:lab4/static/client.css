@@ -2,8 +2,26 @@
 /*contains all the styling*/
 
 
-body {
-    background-color: #0003ac;
+body::before {
+    margin: -8px;
+    content:""; /* required for ::before */
+    position:fixed; /* don't scroll with page */
+    z-index:-100; /* place behind elements on page */
+    width:100%;
+    height:100%;
+    background-color:#0d5357;
+    background-image: 
+    radial-gradient(circle farthest-side at top center, transparent, #0f41c9), 
+    radial-gradient(ellipse farthest-corner at 0% 100%, transparent, #620f83);
+    animation:bg-change 15s infinite;
+}
+@keyframes bg-change {
+    0%, 100% {
+        filter:hue-rotate(20deg);
+    }
+    50% {
+        filter:hue-rotate(-70deg);
+    }
 }
 #container {
     width: 604px;
@@ -33,6 +51,16 @@ body {
     width: 246px;
     height: 52px;
 }
+#recover{
+    float: right;
+    width: 246px;
+    height: 96px;
+    border: 2px solid rgb(0,0,0);
+    margin-top: 15px;
+    margin-right: -2px;
+    background-color: #ffffff;
+}
+
 #signin_error, #signup_error{
     color: red;
     font-size: 10px;
@@ -84,26 +112,43 @@ body {
     margin-right: 5px;
 }
 
-#signout{
-    margin-top: 10px;
-    float: left;
-}
-
 
 #user_info, #post_stuff, #search_user_info, #search_user, #changepassword{
     text-align: left;
     margin: 20px;
+    padding: 20px;
+    background-color: #0086af;
+    border-radius: 15px;
+}
+
+.error{
+    text-align: left;
+    margin: 20px;
     padding: 10px;
-    background-color: #f7c931;
+    background-color: #0086af;
+    border-radius: 15px;
+
+}
+#signoutcontainer{
+    height: 200px;
+    position: relative;
+    border: 3px solid green;
+}
+#signout{
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
+#signoutsubmit{
+    margin:50px;
 }
 
 
 #newpasswordsubmit{
     margin-top: 10px;
 }
-#signoutsubmit{
-    margin: 20px;
-}
+
 
 #text_area, #text_area_other{
     margin-top: 10px;
