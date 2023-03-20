@@ -250,6 +250,7 @@ tabview = function(tabname) {
 
 
 user_info = function() {
+    var message = "";
     var req = new XMLHttpRequest();
     req.open("GET", "/get_user_data_by_token", true);
     req.setRequestHeader("Content-type", "application/json;charset=UTF-8");
@@ -259,7 +260,7 @@ user_info = function() {
     req.send(null);
     req.onreadystatechange = function(){
         if (req.readyState == 4){
-            let message = "";
+            
             if (req.status == 200){
                 let data = JSON.parse(req.responseText);
                 document.getElementById("user_email").innerHTML = data[0];
