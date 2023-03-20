@@ -75,14 +75,14 @@ def sign_out():
         else:
             return "", 500 #Internal server error
     else:
-        return "", 405 #Method not allowed
+        return "", 401 #Unauthorized
 
 
 @app.route('/sign_in', methods=['POST'])
 def sign_in():
     data = request.get_json()
     email = data['email']
-    if validate_email(email) == True:
+    if validate_email(email):
         password = data['password']
         user = database_helper.find_user(email)
         if user != None:
