@@ -267,6 +267,8 @@ user_info = function() {
             }
             else if (req.status == 401){
                 message = "You are not signed in lol.";
+                localStorage.setItem('token', "");
+                displayView();
             }
             else if (req.status == 404){
                 message = "Failed to load info!";
