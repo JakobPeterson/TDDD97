@@ -4,16 +4,22 @@
 displayView = function(){
     //the code required to display a view
     if(localStorage.getItem('token') == null || localStorage.getItem('token') == ""){
+        alert("1");
         console.log(localStorage.getItem('token'));
         document.getElementById('content').innerHTML = document.getElementById('welcomeview').innerHTML;   
     }
     else {
+        alert("bajs");
         document.getElementById('content').innerHTML = document.getElementById('profileview').innerHTML;
         document.getElementById('home_button').style.color = "green";
         
+        alert("1");
         user_info();
+        alert("2");
         load_text();
+        alert("3");
         socket_connect();
+        alert("4");
     }    
 }
 
