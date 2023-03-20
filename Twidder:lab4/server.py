@@ -128,7 +128,7 @@ def sign_up():
             len(country) == None):
             success = database_helper.reguser(email, pw_hash, firstname, familyname, gender, city, country)
             if (success == True):
-                return "", 200 #OK, new user
+                return "", 201 #Created, new user
             else:
                 return "", 500 #Internal server error, failed to create new user even though correct data
             
