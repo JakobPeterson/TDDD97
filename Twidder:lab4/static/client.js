@@ -9,7 +9,6 @@ displayView = function(){
         document.getElementById('content').innerHTML = document.getElementById('welcomeview').innerHTML;   
     }
     else {
-        alert("bajs");
         document.getElementById('content').innerHTML = document.getElementById('profileview').innerHTML;
         document.getElementById('home_button').style.color = "green";
         
