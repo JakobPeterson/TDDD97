@@ -67,15 +67,12 @@ def teardown(exception):
 def sign_out():
     token = request.headers['Authorization'] ##token = hmac_token() 
     email = database_helper.token_to_email(token)
-    if (email != None):
-        if (email in sockets):
-            del sockets[email]
-        if (database_helper.remove_user(token)):
-            return "", 200 #OK
-        else:
-            return "", 500 #Internal server error
+    if (email in sockets):
+        del sockets[email]
+    if (database_helper.remove_user(token)):
+        return "", 200 #OK
     else:
-        return "", 401 #Unathorized
+        return "", 500 #Internal server error
 
 
 @app.route('/sign_in', methods=['POST'])
