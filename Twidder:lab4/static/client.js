@@ -270,15 +270,13 @@ user_info = function() {
                 document.getElementById('user_city').innerHTML = data[5];
                 document.getElementById('user_country').innerHTML = data[6];
                 message = "User info recieved!";
-                document.getElementById("home_error_container").style.color = "green";
             }
             else if (req.status == 401){
                 message = "You are not signed in lol.";
-                document.getElementById("home_error_container").style.color = "red";
             }
             else if (req.status == 404){
                 message = "Failed to load info!";
-                document.getElementById("home_error:container").style.color = "red";
+ 
                 localStorage.setItem('token', "");
                 displayView();
             }
