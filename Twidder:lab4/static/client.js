@@ -35,7 +35,7 @@ function socket_connect(){
 
 
 window.onload = function() {
-    localStorage.setItem('token', "");
+    //localStorage.setItem('token', "");
     displayView();
 }
 
@@ -53,7 +53,7 @@ signout = function() {
     req.open("DELETE", "/sign_out", true); 
     req.setRequestHeader("Content-type", "application/json;charset=UTF-8")
     req.setRequestHeader("Email", localStorage.getItem('email'));
-    token = localStorage.getItem(token)//hmac_token();
+    token = localStorage.getItem('token')//hmac_token();
     req.setRequestHeader("Authorization", token); 
     //data = {'email': localStorage.getItem('email'), 'token': token};
     req.setRequestHeader("Authorization", token);
@@ -88,7 +88,7 @@ function changepassword(formData) {
         req.open("PUT", "/change_password", true);
         req.setRequestHeader("Content-type", "application/json;charset=UTF-8");
         req.setRequestHeader("Email", localStorage.getItem('email'));
-        token = localStorage.getItem(token) //hmac_token(); 
+        token = localStorage.getItem('token') //hmac_token(); 
         req.setRequestHeader("Authorization", token);
         req.send(JSON.stringify({'password' : oldpassword, 'newpassword' : newpassword}));
         req.onreadystatechange =  function(){
@@ -250,7 +250,7 @@ user_info = function() {
     req.open("GET", "/get_user_data_by_token", true);
     req.setRequestHeader("Content-type", "application/json;charset=UTF-8");
     req.setRequestHeader("Email", localStorage.getItem('email'));
-    token = localStorage.getItem(token)//hmac_token();
+    token = localStorage.getItem('token')//hmac_token();
     req.setRequestHeader("Authorization", token);
     req.send(null);
     req.onreadystatechange = function(){
@@ -283,7 +283,7 @@ search_user_info = function(formData) {
     //let data = formData.search_user_text.value.toLowerCase();
     req.open("PUT", "/get_user_data_by_email", true);
     req.setRequestHeader("Email", localStorage.getItem('email'));
-    token = localStorage.getItem(token)//hmac_token();
+    token = localStorage.getItem('token')//hmac_token();
     req.setRequestHeader("Authorization", token);
     req.setRequestHeader("Content-type", "application/json;charset=UTF-8");
     req.send(JSON.stringify({'email':formData.search_user_text.value.toLowerCase()}));
@@ -321,7 +321,7 @@ post = function(formData){
     req.open("POST", "/post_message", true); 
     req.setRequestHeader("Content-type", "application/json;charset=UTF-8");
     req.setRequestHeader("Email", localStorage.getItem('email'));
-    token = localStorage.getItem(token)//hmac_token();
+    token = localStorage.getItem('token')//hmac_token();
     req.setRequestHeader("Authorization", token);
     req.send(JSON.stringify({
         'message' : formData.post_text.value,
@@ -352,7 +352,7 @@ post_other = function(formData){
     var req = new XMLHttpRequest();
     req.open("POST", "/post_message", true); 
     req.setRequestHeader("Email", localStorage.getItem('email'));
-    token = localStorage.getItem(token)//hmac_token(); 
+    token = localStorage.getItem('token')//hmac_token(); 
     req.setRequestHeader("Authorization", token);
     req.setRequestHeader("Content-type", "application/json;charset=UTF-8");
     to_email = document.getElementById('search_user_email').innerHTML;
@@ -386,7 +386,7 @@ function load_text(){
     var req = new XMLHttpRequest();
     req.open("GET", "/get_user_messages_by_token", true); 
     req.setRequestHeader("Email", localStorage.getItem('email'));
-    token = localStorage.getItem(token)//hmac_token();
+    token = localStorage.getItem('token')//hmac_token();
     req.setRequestHeader("Authorization", token);
     req.setRequestHeader("Content-type", "application/json;charset=UTF-8");
     req.send(null);
@@ -418,7 +418,7 @@ function load_text_other(){
     var req = new XMLHttpRequest();
     req.open("PUT", "/get_user_messages_by_email", true); 
     req.setRequestHeader("Email", localStorage.getItem('email'));
-    token = localStorage.getItem(token)//hmac_token();
+    token = localStorage.getItem('token')//hmac_token();
     req.setRequestHeader("Authorization", token);
     req.setRequestHeader("Content-type", "application/json;charset=UTF-8");
     req.send(JSON.stringify({'email':document.getElementById('search_user_text').value.toLowerCase()}));
