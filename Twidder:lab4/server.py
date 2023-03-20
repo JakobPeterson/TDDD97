@@ -28,10 +28,10 @@ def hmac_token():
     print(token)
     hash_token = request.headers['Authorization']
     print(hash_token)
-    if token != None:
+    if (token != None):
         compare_token = hmac.new(token.encode('utf-8'), token.encode('utf-8'), hashlib.sha256)
         print(compare_token.hexdigest())
-        if hash_token == compare_token.hexdigest():
+        if (hash_token == compare_token.hexdigest()):
             print("Same")
             return token
         else:
@@ -50,7 +50,7 @@ def socket_connect(ws):
     while True:
         token = ws.receive()
         email = database_helper.token_to_email(token)
-        if email:
+        if (email != None):
             sockets[email] = ws
             print("email added in ws")
         else:
@@ -67,30 +67,30 @@ def teardown(exception):
 def sign_out():
     token = hmac_token() ##request.headers['Authorization']
     email = database_helper.token_to_email(token)
-    if email != None:
-        if email in sockets:
+    if (email != None):
+        if (email in sockets):
             del sockets[email]
-        if database_helper.remove_user(token):
+        if (database_helper.remove_user(token)):
             return "", 200 #OK
         else:
             return "", 500 #Internal server error
     else:
-        return "", 401 #Unauthorized
+        return "", 401 #Unathorized
 
 
 @app.route('/sign_in', methods=['POST'])
 def sign_in():
     data = request.get_json()
     email = data['email']
-    if validate_email(email):
+    if (validate_email(email)):
         password = data['password']
         user = database_helper.find_user(email)
-        if user != None:
-            if  user[1] == email and bcrypt.check_password_hash(user[3], password): ## new
-                if email in sockets:
+        if (user != None):
+            if  (user[1] == email and bcrypt.check_password_hash(user[3], password)): ## new
+                if (email in sockets):
                     other_ws = sockets[email]
                     other_ws.send('signout')
-                    #other_ws.close()
+                    other_ws.close()
                     database_helper.remove_user_by_email(email)
                     del sockets[email]
                 token = database_helper.generate_token()
@@ -118,7 +118,7 @@ def sign_up():
     city = data['city']
     country = data['country']
     pw_hash = bcrypt.generate_password_hash(password).decode('utf-8')
-    if database_helper.find_user(email) is None:
+    if (database_helper.find_user(email) is None):
         if not (validate_email(email) == True or
             len(password) < 6 or
             len(firstname) == None or
@@ -146,10 +146,10 @@ def change_password():
         data = request.get_json()
         password = data['password']
         newpassword = data['newpassword']
-        if (len(newpassword) < 6):
+        if (len(newpassword) > 6):
             email = database_helper.token_to_email(token)
             user = database_helper.find_user(email)
-            if bcrypt.check_password_hash(user[3], password):
+            if (bcrypt.check_password_hash(user[3], password)):
                 database_helper.change_password(email, bcrypt.generate_password_hash(newpassword).decode('utf-8')) ## new
                 return "", 200 #OK
             else:
@@ -166,9 +166,9 @@ def get_user_data_by_email():
     data = request.get_json()
     email = data['email']
     user_email = database_helper.token_to_email(token)
-    if user_email != None:
+    if (user_email != None):
         user = database_helper.user_data_by_email(email)
-        if user != None:
+        if (user != None):
             return jsonify(user), 200 #OK
         else:
             return "", 404 #Not found
@@ -196,8 +196,8 @@ def get_user_messages_by_email():
     data = request.get_json()
     email = data['email']
     user_email = database_helper.token_to_email(token)
-    if token:
-        if database_helper.find_user(email):
+    if (token!=None):
+        if (database_helper.find_user(email)):
             messages = database_helper.get_user_messages_by_email(email)
             return jsonify(messages), 200 #OK
         else:
@@ -209,9 +209,9 @@ def get_user_messages_by_email():
 def get_user_messages_by_token():
     token = hmac_token()
     email = database_helper.token_to_email(token)
-    if email:
+    if (email != None):
         messages = database_helper.get_user_messages_by_email(email)
-        if messages != None:
+        if (messages != None):
             return jsonify(messages), 200
         else:
             return "", 404 #Not found
@@ -223,13 +223,13 @@ def post_message():
     data = request.get_json()
     token = hmac_token()
     from_email = database_helper.token_to_email(token)
-    if from_email:
+    if (from_email != None):
         message = data['message']
-        if message != "":
+        if (message != ""):
             to_email = data['to_email']
             if (to_email == ""):
                 to_email = from_email
-            if database_helper.find_user(to_email) != None:
+            if (database_helper.find_user(to_email) != None):
                 success = database_helper.post_message(from_email, message, to_email)
                 if(success):
                     return "", 201 #Created
@@ -247,9 +247,9 @@ def post_message():
 def recover_password():
     data = request.get_json()
     email = data['email']
-    if validate_email(email) == True:
+    if (validate_email(email) == True):
         user = database_helper.find_user(email)
-        if user != None:
+        if (user != None):
             newpassword = database_helper.generate_token()
             #from_email = 'elcustomerosuporto@gmail.com'
             #from_password = 'elcnmtoqhloedggi'
