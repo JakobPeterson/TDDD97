@@ -4,7 +4,7 @@
         <title>twidder</title>
         <link href="static/client.css" rel="stylesheet" type="text/css">
         <script src="static/client.js" type="text/javascript"></script>
-        
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
 
         <script id="welcomeview" type="text/html">
             <div id="container">
@@ -60,11 +60,12 @@
                     <p id="signup_error"></p>
                     <input class="button" type="submit" value="signup">
                 </form>
+
                 <form id = "recover" onsubmit = "recover(this);return false;">
-                    <div class="input"><label for="recoveremail"> Forgot password? Email: </label>
-                        <input id="recoveremail" type="email" required></div>
+                    <div class="input"><label for="recoveremail">Forgot password?</label>
+                    <div class="input"><label for="recoveremail">Email</label>
+                    <input id="recoveremail" type="email" required></div>
                     <input class = "button" type = "submit" value = "Recover">
-                
                 </form>
 
                 </div>
@@ -80,7 +81,7 @@
             </div> 
 
             <div id = "home" style="display: block;">
-                <p id = "home_error"> </p>
+                
                 <div id = "user_info">
                     <div>
                         <label>Email:</label>
@@ -119,6 +120,8 @@
                 <button class = "reload" type = "submit" onclick="load_text()">Reload</button>
                 </div>
                 
+                <div id="home_error_container" class = "error"><p id = "home_error" > </p></div>
+                
 
                 
             </div>
@@ -129,7 +132,7 @@
                         <label>Search user:</label>
                         <input id="search_user_text" type="email">
                         <button id = "search_user_submit" type = "submit">Search</button>
-                        <label id="search_error"></label>
+
                     </form>
 
                     <div id = "search_user_info" style="display: none;">
@@ -168,6 +171,7 @@
                         <button class = "reload" type = "submit" onclick="load_text_other()">Reload</button>
                         
                     </div>
+                    <div id="browse_error_container" class = "error"><p id = "browse_error"> </p></div>
                     
                 </div>
             </div>
@@ -183,13 +187,16 @@
                     <div class="input"><label for="renewpassword">Repeat new password</label>
                     <input id="renewpassword" type="password" required></div>
                     <input id = "newpasswordsubmit" type = "submit" value="Change password">
-                    <p id="changepassword_error"></p>
                 </form>
-                <form id = "signout">
-                    <button id = "signoutsubmit" type = "submit" onclick="signout()">Sign out</button>
-                </form> 
+                <div id = "account_error_container" class = "error"><p id = "account_error" > </p></div>
+                <div id = "signoutcontainer">
+                    <div id = "signout">
+                        <button id = "signoutsubmit" type = "submit" onclick="signout()">Sign out</button>
+                    </div> 
+                </div>
+                
             </div>
-
+            
         </script>
 
     </head>
