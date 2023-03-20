@@ -146,13 +146,16 @@ def change_password():
         data = request.get_json()
         password = data['password']
         newpassword = data['newpassword']
-        email = database_helper.token_to_email(token)
-        user = database_helper.find_user(email)
-        if bcrypt.check_password_hash(user[3], password):
-            database_helper.change_password(email, bcrypt.generate_password_hash(newpassword).decode('utf-8')) ## new
-            return "", 200 #OK
+        if (len(newpassword) < 6):
+            email = database_helper.token_to_email(token)
+            user = database_helper.find_user(email)
+            if bcrypt.check_password_hash(user[3], password):
+                database_helper.change_password(email, bcrypt.generate_password_hash(newpassword).decode('utf-8')) ## new
+                return "", 200 #OK
+            else:
+                return "", 403 #Forbidden
         else:
-            return "", 403 #Forbidden
+            return "", 400 #Bad request
     else:
         return "", 401 #Unathorized
     
