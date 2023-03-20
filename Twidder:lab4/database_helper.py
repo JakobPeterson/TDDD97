@@ -87,6 +87,15 @@ def token_to_email(token):
     except:
         return None
 
+def token_by_email(email):
+    try:
+        cursor = get_db().execute('SELECT * from loggedinusers where email = ?', [email])
+        match = cursor.fetchone()
+        cursor.close()
+        return match[1]
+    except:
+        return None
+
 def remove_user(token):
     cursor = get_db()
     try:
