@@ -19,7 +19,7 @@ displayView = function(){
 
 
 function socket_connect(){
-    var socket = new WebSocket('ws://twiddertwidder.herokuapp.com/profileview');
+    var socket = new WebSocket('ws://0.0.0.0:5000/profileview');
     socket.onopen = function(){
         socket.send(localStorage.getItem('token'));
     }
