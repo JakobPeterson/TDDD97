@@ -76,11 +76,11 @@ signout = function() {
                 console.log("token before signout reload: " + token)
                 displayView();
             }
-            else if (req.status == 401){
-                message = "User doesn't exist!";
-            }
-            else if (req.status == 404){
+            else if (req.status == 500){
                 message = "Failed to sign out!";
+            }
+            else if (req.status == 401){
+                message = "You are not logged in!";
             }
         }
     }
@@ -110,8 +110,12 @@ function changepassword(formData) {
                     message = "Not authorized.";
                     document.getElementById("account_error").style.color = "red";
                 }
-                else if (req.status == 404){
+                else if (req.status == 403){
                     message = "Incorrect password!";
+                    document.getElementById("account_error").style.color = "red";
+                }
+                else if (req.status == 400){
+                    message = "Password to short!";
                     document.getElementById("account_error").style.color = "red";
                 }
                 document.getElementById('account_error').innerHTML = message;
@@ -167,11 +171,11 @@ function signup(formData){
         req.onreadystatechange =  function(){
             if (req.readyState == 4){
                 let message = ""
-                if (req.status == 200){
+                if (req.status == 201){
                     message = "New user created!";
                     document.getElementById("signup_error").style.color = "green";
                 }
-                else if (req.status == 401){
+                else if (req.status == 409){
                     message = "User already exist!";
                     document.getElementById("signup_error").style.color = "red";
                 }
@@ -179,7 +183,7 @@ function signup(formData){
                     message = "Wrong data format!";
                     document.getElementById("signup_error").style.color = "red";
                 }
-                else if (req.status == 404){
+                else if (req.status == 500){
                     message = "Failed to create a new user!";
                     document.getElementById("signup_error").style.color = "red";
                 }
@@ -208,7 +212,7 @@ function signin(formData){
                 displayView();
             }
             else if (req.status == 401){
-                message = "Something!";
+                message = "Wrong password or username!";
                 document.getElementById("signin_error").style.color = "red";
                 document.getElementById('signin_error').innerHTML = message;
             }
@@ -218,7 +222,12 @@ function signin(formData){
                 document.getElementById('signin_error').innerHTML = message;
             }
             else if (req.status == 404){
-                message = "Failed to log in!";
+                message = "User doesn't exist!";
+                document.getElementById("signin_error").style.color = "red";
+                document.getElementById('signin_error').innerHTML = message;
+            }
+            else if (req.status == 500){
+                message = "Failed to sign in!";
                 document.getElementById("signin_error").style.color = "red";
                 document.getElementById('signin_error').innerHTML = message;
             }
@@ -245,7 +254,6 @@ tabview = function(tabname) {
 
 
 user_info = function() {
-    var message = "";
     var req = new XMLHttpRequest();
     req.open("GET", "/get_user_data_by_token", true);
     req.setRequestHeader("Content-type", "application/json;charset=UTF-8");
@@ -255,6 +263,7 @@ user_info = function() {
     req.send(null);
     req.onreadystatechange = function(){
         if (req.readyState == 4){
+            let message = "";
             if (req.status == 200){
                 let data = JSON.parse(req.responseText);
                 document.getElementById("user_email").innerHTML = data[0];
@@ -267,7 +276,7 @@ user_info = function() {
                 document.getElementById("home_error_container").style.color = "green";
             }
             else if (req.status == 401){
-                message = "Not authorized.";
+                message = "You are not signed in lol.";
                 document.getElementById("home_error_container").style.color = "red";
             }
             else if (req.status == 404){
@@ -282,7 +291,6 @@ user_info = function() {
 }
 
 search_user_info = function(formData) {
-    var message = "";
     var req = new XMLHttpRequest();
     //let data = formData.search_user_text.value.toLowerCase();
     req.open("PUT", "/get_user_data_by_email", true);
@@ -293,6 +301,7 @@ search_user_info = function(formData) {
     req.send(JSON.stringify({'email':formData.search_user_text.value.toLowerCase()}));
     req.onreadystatechange =  function(){
         if (req.readyState == 4){
+            let message = "";
             if (req.status == 200){
                 document.getElementById("search_user_info").style.display = "block";
                 message = "User info recieved!";
@@ -307,7 +316,7 @@ search_user_info = function(formData) {
             }
             else if (req.status == 401){
                 document.getElementById("search_user_info").style.display = "none";
-                message = "Not authorized.";
+                message = "You are not logged in lol.";
             }
             else if (req.status == 404){
                 document.getElementById("search_user_info").style.display = "none";
@@ -320,8 +329,6 @@ search_user_info = function(formData) {
 
 
 post = function(formData){
-    
-    var message = "";
     var req = new XMLHttpRequest();
     req.open("POST", "/post_message", true); 
     req.setRequestHeader("Content-type", "application/json;charset=UTF-8");
@@ -333,21 +340,27 @@ post = function(formData){
         'to_email' : "" }));
     req.onreadystatechange =  function(){
         if (req.readyState == 4){
+            let message = "";
             if (req.status == 201){
                 message = "Message posted!";
             }
-            else if (req.status == 404){
-                message = "Wright a message"
+            else if (req.status == 400){
+                message = "Write a message!"
             }
-            else if (req.status == 404){
-                message = "Failed to post message!";
+            else if (req.status == 401){
+                message = "You are not logged in lol.!";
+            }
+            else if (req.status == 410){
+                message = "The receiver doesn't exist!";
+            }
+            else if (req.status == 500){
+                message = "Failed to post messsage!";
             }
             document.getElementById('home_error').innerHTML = message;
         }
     }
 }
 post_other = function(formData){
-    var message = "";
     var req = new XMLHttpRequest();
     req.open("POST", "/post_message", true); 
     req.setRequestHeader("Email", localStorage.getItem('email'));
@@ -360,14 +373,21 @@ post_other = function(formData){
         'to_email' : to_email}));
     req.onreadystatechange =  function(){
         if (req.readyState == 4){
+            let message = "";
             if (req.status == 201){
                 message = "Message posted!";
             }
-            else if (req.status == 404){
-                message = "Wright a message"
+            else if (req.status == 400){
+                message = "Write a message!"
             }
-            else if (req.status == 404){
-                message = "Failed to post message!";
+            else if (req.status == 401){
+                message = "You are not logged in lol.!";
+            }
+            else if (req.status == 410){
+                message = "The receiver doesn't exist!";
+            }
+            else if (req.status == 500){
+                message = "Failed to post messsage!";
             }
             document.getElementById('browse_error').innerHTML = message;
         }
@@ -375,7 +395,6 @@ post_other = function(formData){
 }
 
 function load_text(){
-    var message = "";
     var req = new XMLHttpRequest();
     req.open("GET", "/get_user_messages_by_token", true); 
     req.setRequestHeader("Email", localStorage.getItem('email'));
@@ -386,6 +405,7 @@ function load_text(){
     var text_format = "";
     req.onreadystatechange =  function(){
         if (req.readyState == 4){
+            let message = "";
             if (req.status == 200){
                 let text = JSON.parse(req.responseText);
                 message = "Messages retrieved!";
@@ -395,11 +415,12 @@ function load_text(){
                 document.getElementById('text_area').innerHTML = text_format;
             }
             else if (req.status == 401){
-                message = "nä such user";
+                message = "Your are not signed in.";
             }
             else if (req.status == 404){
-                message = "ping";
+                message = "No messages found.";
             }
+            document.getElementById('home_error').innerHTML = message;
         }
     }
 }
@@ -425,11 +446,12 @@ function load_text_other(){
                 document.getElementById('text_area_other').innerHTML = text_format;
             }
             else if (req.status == 401){
-                message = "nä such user";
+                message = "Your are not signed in.";
             }
             else if (req.status == 404){
-                message = "ping";
+                message = "No messages found.";
             }
+            document.getElementById('browse_error').innerHTML = message;
         }
     }
 }
@@ -447,19 +469,21 @@ function recover(formData){
                 message = "Check your email for the new password";
                 document.getElementById("signin_error").style.color = "green";
                 document.getElementById('signin_error').innerHTML = message;
-                
             }
             else if (req.status == 404){
                 message = "There is no user with that username";
                 document.getElementById("signin_error").style.color = "red";
-                document.getElementById('signin_error').innerHTML = message;
-                
+                document.getElementById('signin_error').innerHTML = message;   
             }
             else if (req.status == 500){
-                message = "Twidder fail";
+                message = "Failed to send new password";
                 document.getElementById("signin_error").style.color = "red";
                 document.getElementById('signin_error').innerHTML = message;
-                
+            }
+            else if (req.status == 400){
+                message = "Wrong format";
+                document.getElementById("signin_error").style.color = "red";
+                document.getElementById('signin_error').innerHTML = message;
             }
         }
     }
