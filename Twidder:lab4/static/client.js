@@ -45,15 +45,9 @@ window.onload = function() {
 
 
 function hmac_token(){
-    console.log("2");
     let token = localStorage.getItem('token');
-    console.log(token);
     let secret = 'secret';
     var hmac = CryptoJS.HmacSHA256(token, token);
-    console.log(hmac.toString(CryptoJS.enc.Hex));
-    console.log("4444");
-    console.log("666666");
-    console.log(hmac);
     return hmac;
 }
 
@@ -70,10 +64,8 @@ signout = function() {
     req.onreadystatechange = function(){
         if (req.readyState == 4){
             if (req.status == 200){
-                console.log("signout");
                 message = "Signed out successfully!";
                 localStorage.setItem('token', "");
-                console.log("token before signout reload: " + token)
                 displayView();
             }
             else if (req.status == 500){
@@ -197,7 +189,6 @@ function signup(formData){
 function signin(formData){
     user = {'email':formData.signinEmail.value.toLowerCase(), 'password':formData.signinPassword.value};
     localStorage.setItem('email',formData.signinEmail.value.toLowerCase());
-    console.log(localStorage.getItem('email'))
     let message = " ";
     let req = new XMLHttpRequest();
     req.open("POST", "/sign_in", true);
@@ -207,7 +198,6 @@ function signin(formData){
         if (req.readyState == 4){
             if (req.status == 200){
                 message = "Sign in successful!";
-                //document.getElementById("signin_error").style.color = "green";
                 localStorage.setItem('token', JSON.parse(req.responseText));
                 displayView();
             }
