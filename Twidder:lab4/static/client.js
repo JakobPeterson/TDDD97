@@ -52,8 +52,10 @@ window.onload = function() {
 
 function hmac_token(){
     let token = localStorage.getItem('token');
+    alert(token);
     let secret = 'secret';
     var hmac = CryptoJS.HmacSHA256(token, token);
+    alert(hmac);
     return hmac;
 }
 
