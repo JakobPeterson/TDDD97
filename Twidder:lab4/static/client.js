@@ -251,13 +251,21 @@ tabview = function(tabname) {
 
 user_info = function() {
     var message = "";
+    alert("hejdasasda");
     var req = new XMLHttpRequest();
+    alert("hedasj");
     req.open("GET", "/get_user_data_by_token", true);
+    alert("hedasdj");
     req.setRequestHeader("Content-type", "application/json;charset=UTF-8");
+    alert("hejasds");
     req.setRequestHeader("Email", localStorage.getItem('email'));
+    alert("heas");
     token = hmac_token(); 
+    alert("hejaa");
     req.setRequestHeader("Authorization", token);
+    alert("hejsaaa");
     req.send(null);
+    alert("hejsa");
     req.onreadystatechange = function(){
         if (req.readyState == 4){
             
