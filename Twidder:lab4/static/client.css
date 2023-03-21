@@ -61,7 +61,7 @@ body::before {
     background-color: #ffffff;
 }
 
-#signin_error, #signup_error{
+#signin_error, #signup_error, #recover_error{
     color: red;
     font-size: 10px;
     float: left;

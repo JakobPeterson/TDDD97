@@ -17,15 +17,14 @@ displayView = function(){
 }
 
 
-function socket_connect(){
+function socket_connect(){ //socket handler
     var socket = new WebSocket('ws://127.0.0.1:8000/profileview');
     socket.onopen = function(){
         socket.send(localStorage.getItem('token'));
     }
-    console.log("success");
     socket.addEventListener('message', (event) => {
         console.log(event.data);
-        if(event.data == 'signout'){
+        if(event.data == 'signout'){ //if logged in again, receive sign out
             //signout();
             localStorage.setItem('token', "");
             displayView();
@@ -35,14 +34,12 @@ function socket_connect(){
 
 
 window.onload = function() {
-    //localStorage.setItem('token', "");
     displayView();
 }
 
 
-function hmac_token(){
+function hmac_token(){ //creates hmac, encrypted token with token as secret key
     let token = localStorage.getItem('token');
-    let secret = 'secret';
     var hmac = CryptoJS.HmacSHA256(token, token);
     return hmac;
 }
@@ -53,18 +50,14 @@ signout = function() {
     req.open("DELETE", "/sign_out", true); 
     req.setRequestHeader("Content-type", "application/json;charset=UTF-8")
     req.setRequestHeader("Email", localStorage.getItem('email'));
-    token = localStorage.getItem('token')//hmac_token();
-    req.setRequestHeader("Authorization", token); 
-    //data = {'email': localStorage.getItem('email'), 'token': token};
+    token = hmac_token(); 
     req.setRequestHeader("Authorization", token);
     req.send(null);
     req.onreadystatechange = function(){
         if (req.readyState == 4){
             if (req.status == 200){
-                console.log("signout");
                 message = "Signed out successfully!";
                 localStorage.setItem('token', "");
-                console.log("token before signout reload: " + token)
                 displayView();
             }
             else if (req.status == 500){
@@ -89,7 +82,7 @@ function changepassword(formData) {
         req.open("PUT", "/change_password", true);
         req.setRequestHeader("Content-type", "application/json;charset=UTF-8");
         req.setRequestHeader("Email", localStorage.getItem('email'));
-        token = localStorage.getItem('token') //hmac_token(); 
+        token = hmac_token(); 
         req.setRequestHeader("Authorization", token);
         req.send(JSON.stringify({'password' : oldpassword, 'newpassword' : newpassword}));
         req.onreadystatechange =  function(){
@@ -189,7 +182,6 @@ function signup(formData){
 function signin(formData){
     user = {'email':formData.signinEmail.value.toLowerCase(), 'password':formData.signinPassword.value};
     localStorage.setItem('email',formData.signinEmail.value.toLowerCase());
-    console.log(localStorage.getItem('email'))
     let message = " ";
     let req = new XMLHttpRequest();
     req.open("POST", "/sign_in", true);
@@ -199,7 +191,6 @@ function signin(formData){
         if (req.readyState == 4){
             if (req.status == 200){
                 message = "Sign in successful!";
-                //document.getElementById("signin_error").style.color = "green";
                 localStorage.setItem('token', JSON.parse(req.responseText));
                 displayView();
             }
@@ -251,7 +242,7 @@ user_info = function() {
     req.open("GET", "/get_user_data_by_token", true);
     req.setRequestHeader("Content-type", "application/json;charset=UTF-8");
     req.setRequestHeader("Email", localStorage.getItem('email'));
-    token = localStorage.getItem('token')//hmac_token();
+    token = hmac_token(); 
     req.setRequestHeader("Authorization", token);
     req.send(null);
     req.onreadystatechange = function(){
@@ -268,8 +259,6 @@ user_info = function() {
             }
             else if (req.status == 401){
                 message = "You are not signed in lol.";
-                localStorage.setItem('token', "");
-                displayView();
             }
             else if (req.status == 404){
                 message = "Failed to load info!";
@@ -283,10 +272,9 @@ user_info = function() {
 
 search_user_info = function(formData) {
     var req = new XMLHttpRequest();
-    //let data = formData.search_user_text.value.toLowerCase();
     req.open("PUT", "/get_user_data_by_email", true);
     req.setRequestHeader("Email", localStorage.getItem('email'));
-    token = localStorage.getItem('token')//hmac_token();
+    token = hmac_token(); 
     req.setRequestHeader("Authorization", token);
     req.setRequestHeader("Content-type", "application/json;charset=UTF-8");
     req.send(JSON.stringify({'email':formData.search_user_text.value.toLowerCase()}));
@@ -324,7 +312,7 @@ post = function(formData){
     req.open("POST", "/post_message", true); 
     req.setRequestHeader("Content-type", "application/json;charset=UTF-8");
     req.setRequestHeader("Email", localStorage.getItem('email'));
-    token = localStorage.getItem('token')//hmac_token();
+    token = hmac_token(); 
     req.setRequestHeader("Authorization", token);
     req.send(JSON.stringify({
         'message' : formData.post_text.value,
@@ -355,7 +343,7 @@ post_other = function(formData){
     var req = new XMLHttpRequest();
     req.open("POST", "/post_message", true); 
     req.setRequestHeader("Email", localStorage.getItem('email'));
-    token = localStorage.getItem('token')//hmac_token(); 
+    token = hmac_token(); 
     req.setRequestHeader("Authorization", token);
     req.setRequestHeader("Content-type", "application/json;charset=UTF-8");
     to_email = document.getElementById('search_user_email').innerHTML;
@@ -389,7 +377,7 @@ function load_text(){
     var req = new XMLHttpRequest();
     req.open("GET", "/get_user_messages_by_token", true); 
     req.setRequestHeader("Email", localStorage.getItem('email'));
-    token = localStorage.getItem('token')//hmac_token();
+    token = hmac_token(); 
     req.setRequestHeader("Authorization", token);
     req.setRequestHeader("Content-type", "application/json;charset=UTF-8");
     req.send(null);
@@ -421,7 +409,7 @@ function load_text_other(){
     var req = new XMLHttpRequest();
     req.open("PUT", "/get_user_messages_by_email", true); 
     req.setRequestHeader("Email", localStorage.getItem('email'));
-    token = localStorage.getItem('token')//hmac_token();
+    token = hmac_token(); 
     req.setRequestHeader("Authorization", token);
     req.setRequestHeader("Content-type", "application/json;charset=UTF-8");
     req.send(JSON.stringify({'email':document.getElementById('search_user_text').value.toLowerCase()}));
@@ -458,23 +446,23 @@ function recover(formData){
         if (req.readyState == 4){
             if (req.status == 200){
                 message = "Check your email for the new password";
-                document.getElementById("signin_error").style.color = "green";
-                document.getElementById('signin_error').innerHTML = message;
+                document.getElementById("recover_error").style.color = "green";
+                document.getElementById('recover_error').innerHTML = message;
             }
             else if (req.status == 404){
                 message = "There is no user with that username";
                 document.getElementById("signin_error").style.color = "red";
-                document.getElementById('signin_error').innerHTML = message;   
+                document.getElementById('recover_error').innerHTML = message;   
             }
             else if (req.status == 500){
                 message = "Failed to send new password";
                 document.getElementById("signin_error").style.color = "red";
-                document.getElementById('signin_error').innerHTML = message;
+                document.getElementById('recover_error').innerHTML = message;
             }
             else if (req.status == 400){
                 message = "Wrong format";
                 document.getElementById("signin_error").style.color = "red";
-                document.getElementById('signin_error').innerHTML = message;
+                document.getElementById('recover_error').innerHTML = message;
             }
         }
     }
