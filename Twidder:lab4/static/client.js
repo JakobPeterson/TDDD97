@@ -34,6 +34,7 @@ function socket_connect(){ //socket handler
 
 
 window.onload = function() {
+    localStorage.setItem('token', "");
     displayView();
 }
 
