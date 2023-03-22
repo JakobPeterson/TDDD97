@@ -18,7 +18,7 @@ displayView = function(){
 
 
 function socket_connect(){ //socket handler
-    var socket = new WebSocket('ws://0.0.0.0:8080/profileview');
+    var socket = new WebSocket('wss://0.0.0.0:80/profileview');
     socket.onopen = function(){
         socket.send(localStorage.getItem('token'));
     }
