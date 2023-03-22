@@ -240,7 +240,7 @@ def post_message():
 def recover_password():  ##Sends a new password to your email
     data = request.get_json()
     email = data['email']
-    if (validate_email(email) == True):
+    if (validate_email(email)):
         user = database_helper.find_user(email)
         if (user != None):
             newpassword = database_helper.generate_token()
@@ -262,7 +262,7 @@ def recover_password():  ##Sends a new password to your email
                 smtp.sendmail(from_email, to_email, em.as_string())
             
             success = database_helper.change_password(email, bcrypt.generate_password_hash(newpassword).decode('utf-8'))
-            if(success==True):
+            if(success):
                 return "", 200 #OK
             else:
                 return "", 500 #Internal server error
